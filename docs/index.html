@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.5, user-scalable=no">
+	<title>2048</title>
+	<style type="text/css">
+		html,body{
+			height: 100%;
+			width: 100%;
+			margin: 0;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+		body{
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		container{
+			width: 576px;
+			height: 576px;
+			border: 16px solid #c3ab9e;
+			background-color: #c3ab9e;
+			box-sizing: border-box;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			align-content: space-between;
+			border-radius: 8px;
+		}
+		block{
+			width: 123px;
+			height: 123px;
+			background: #ccc0b3;
+			border-radius: 4px;
+		}
+
+		block::after{
+			display: block;
+			width: 100%;
+			height: 100%;
+			font-family: Calibri;
+			font-weight: bold;
+			font-size: 96px;
+			text-align: center;
+			line-height: 123px;
+			color: #ffffff;
+		}
+
+		block.n2{
+			background-color: #eee4da;
+		}
+		block.n4{
+			background-color: #ece0c8;
+		}
+		block.n8{
+			background-color: #f2b179;
+		}
+		block.n16{
+			background-color: #ec8d53;
+		}
+		block.n32{
+			background-color: #f57c5f;
+		}
+		block.n64{
+			background-color: #e95937;
+		}
+		block.n128{
+			background-color: #edcf72;
+		}
+		block.n256{
+			background-color: #f1d04b;
+		}
+		block.n512{
+			background-color: #edc850;
+		}
+		block.n1024{
+			background-color: #e3ba14;
+		}
+		block.n2048{
+			background-color: #ecc400;
+		}
+
+		block.n2::after{
+			content: '2';
+			color: #776d6b;
+		}
+		block.n4::after{
+			content: '4';
+			color: #776d6b;
+		}
+		block.n8::after{
+			content: '8';
+		}
+		block.n16::after{
+			content: '16';
+		}
+		block.n32::after{
+			content: '32';
+		}
+		block.n64::after{
+			content: '64';
+		}
+		block.n128::after{
+			font-size: 72px;
+			content: '128';
+		}
+		block.n256::after{
+			font-size: 72px;
+			content: '256';
+		}
+		block.n512::after{
+			font-size: 72px;
+			content: '512';
+		}
+		block.n1024::after{
+			font-size: 54px;
+			content: '1024';
+		}
+		block.n2048::after{
+			font-size: 54px;
+			content: '2048';
+		}
+	</style>
+</head>
+<body>
+	<container>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+		<block></block>
+	</container>
+	<script type="text/javascript">
+		var container = document.getElementsByTagName('container')[0]
+		var blocks = document.getElementsByTagName('block')
+
+		function emptyArray(){
+			return Array.apply(null, {length: blocks.length}).map(function(){return 0})
+		}
+
+		function render(){
+			array.forEach(function(number,index) {
+				blocks[index].className = `n${number}`
+			});
+		}
+
+		function next(){
+			var emptys = []
+			array.map(function(number,index) {
+				if(number == 0){
+					emptys.push(index)
+				}
+			})
+			// if(emptys.length == 0){
+			// 	alert('GAME OVER')
+			// 	return
+			// }
+			var selected = Math.floor(Math.random() * emptys.length)
+			array[emptys[selected]] = [2,4][Math.round(Math.random())]
+			render()
+		}
+
+		function swipe(direction){
+			var queue = [[],[],[],[]]
+
+			if(direction == 'left'){
+				array.forEach(function(number,index){
+					queue[Math.floor(index/4)].push(number)
+				})
+			}
+			else if(direction == 'right'){
+				array.forEach(function(number,index){
+					queue[Math.floor(index/4)].unshift(number)
+				})
+			}
+			else if(direction == 'up'){
+				array.forEach(function(number,index){
+					queue[index%4].push(number)
+				})
+			}
+			else if(direction == 'down'){
+				array.forEach(function(number,index){
+					queue[index%4].unshift(number)
+				})
+			}
+
+			queue.forEach(function(innerQueue,index){
+				innerQueue.indexOf()
+				innerQueue = innerQueue.filter(function(number){return number != 0})
+				var newQueue = []
+				var i = 0
+				while(i < innerQueue.length){
+					if(innerQueue[i] == innerQueue[i + 1]){
+						newQueue.push(innerQueue[i] * 2)
+						i += 2
+					}
+					else{
+						newQueue.push(innerQueue[i])
+						i += 1
+					}
+				}
+				queue[index] = newQueue
+			})
+
+			var newArray = emptyArray()
+
+			if(direction == 'left'){
+				queue.forEach(function(innerQueue,indexI){
+					innerQueue.forEach(function(number,indexJ){
+						newArray[indexI * 4 + indexJ] = number
+					})
+				})
+			}
+			else if(direction == 'right'){
+				queue.forEach(function(innerQueue,indexI){
+					innerQueue.forEach(function(number,indexJ){
+						newArray[indexI * 4 + (3 - indexJ)] = number
+					})
+				})
+			}
+			else if(direction == 'up'){
+				queue.forEach(function(innerQueue,indexI){
+					innerQueue.forEach(function(number,indexJ){
+						newArray[indexJ * 4 + indexI] = number
+					})
+				})
+			}
+			else if(direction == 'down'){
+				queue.forEach(function(innerQueue,indexI){
+					innerQueue.forEach(function(number,indexJ){
+						newArray[(3 - indexJ) * 4 + indexI] = number
+					})
+				})
+			}
+
+			if(newArray.toString() != array.toString()){
+				array = newArray
+				next()
+			}
+		}
+
+		function judge(moveX, moveY){
+			if(moveX < 0 && Math.abs(moveY) < 100){
+				swipe('left')
+			}
+			else if(moveX > 0 && Math.abs(moveY) < 100){
+				swipe('right')
+			}
+			else if(moveY < 0 && Math.abs(moveX) < 100){
+				swipe('up')
+			}
+			else if(moveY > 0 && Math.abs(moveX) < 100){
+				swipe('down')
+			}
+		}
+
+		function touch(){
+
+			let startX = 0
+			let startY = 0
+
+			document.addEventListener('touchstart',touchStart,{passive:true})
+			document.addEventListener('touchmove',touchMove,{passive:true})
+			document.addEventListener('touchend',touchEnd,{passive:true})
+
+			function touchStart(event){
+				startX = event.targetTouches[0].pageX
+				startY = event.targetTouches[0].pageY
+			}
+			function touchMove(event){
+				moveX = event.targetTouches[0].pageX - startX
+				moveY = event.targetTouches[0].pageY - startY
+			}
+			function touchEnd(event){
+				judge(moveX, moveY)
+			}
+
+		}
+
+		window.onload = function(){
+			array = emptyArray()
+			next()
+			touch()
+		}
+
+		document.onmousedown = function(event){
+			let startX = event.clientX
+			let startY = event.clientY
+			document.onmouseup = function(event){
+				let moveX = event.clientX - startX
+				let moveY = event.clientY - startY
+				judge(moveX, moveY)
+			}
+		}
+
+		document.addEventListener("keydown", function(event) {
+			if(event.keyCode == 37){
+				swipe('left')
+			}
+			else if(event.keyCode == 38){
+				swipe('up')
+			}
+			else if(event.keyCode == 39){
+				swipe('right')
+			}
+			else if(event.keyCode == 40){
+				swipe('down')
+			}
+		}, false)
+
+	</script>
+</body>
+</html>
